@@ -61,7 +61,7 @@ class test(Command):
 
     def initialize_options(self):
         self.test_type = 'py.test'
-        for (_,_,_,_,options) in self.test_commands.values():
+        for (_,_,_,_,options) in list(self.test_commands.values()):
             for option in options:
                 name = string.translate(option[0], longopt_xlate).rstrip('=')
                 setattr(self, name, uninitialized)
@@ -160,13 +160,13 @@ def run_py_test(tester):
     if py:
         py.test.cmdline.main(test_files)
     else:
-        print 'WARNING: py.test not found. falling back to unittest. For more informative errors, install py.test'
+        print('WARNING: py.test not found. falling back to unittest. For more informative errors, install py.test')
         import unittest
         suite = unittest.TestSuite()
         for filen in test_files:
             mod = get_pyfile(filen)
             suite.addTest(make_testcase(filen,
-                (fn for fn in mod.__dict__.values() if getattr(fn, '__name__', '').startswith('test_'))
+                (fn for fn in list(mod.__dict__.values()) if getattr(fn, '__name__', '').startswith('test_'))
             ))
         t = unittest.TextTestRunner()
         t.run(suite)
